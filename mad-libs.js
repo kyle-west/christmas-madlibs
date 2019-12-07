@@ -2,13 +2,23 @@ const vowels = [ 'a' , 'e', 'i', 'o', 'u' ]
 const matchingArticle = (word) => vowels.includes(word.charAt(0)) ? 'an' : 'a'
 let totalCount = 0;
 let currentCount = 1;
-const ask = (type, custom=false) => `<b><i>${
-  prompt((custom ? type : `Enter ${matchingArticle(type)} ${type}`) + `  (${currentCount++}/${totalCount})`)
-}</i></b>`
+const ask = (type, custom=false) => {
+  let msg = (custom ? type : `Enter ${matchingArticle(type)} ${type}`)
+  let progress = `  (${currentCount}/${totalCount})`
+  let response = prompt(msg + progress)
+  if (response === null) throw new Error("abort")
+  if (!response) {
+    let errMessage = 'Response required.'
+    return ask(msg.startsWith(errMessage) ? msg : `${errMessage} ${msg}`, true)
+  } else {
+    ++currentCount
+    return `<b><i>${response}</i></b>`
+  }
+}
 
 
 const madLibs =  [
-  [24, () => `
+  ["Letter to Santa", 24, () => `
     Dear Santa,
 
     I have been a very ${ask('adjective')} ${ask('noun')}. This year I always help my
@@ -32,7 +42,7 @@ const madLibs =  [
   `],
 
 
-  [34, () => {
+  ["Christmas Poem", 34, () => {
     let [_1, _2, _3] = [ask('verb'), ask('person\'s name'), ask('plural noun')]
     return `
     Twas the night before ${ask('popular event name')}, when all through the ${ask('noun')}
@@ -104,10 +114,83 @@ const madLibs =  [
     And away they all flew like the down of a thistle.
     But I heard him exclaim, ‘ere he drove out of sight,
     "${ask('something you would say while leaving a party')}!"
-  `}]
+  `}],
+
+
+  ["Christmas Song 1", 13, () => {
+    let [_place, _santa] = [ask('location'), ask('person\'s name')]
+    return `
+    <h1>"${_santa}" is coming to "${_place}"</h1>
+
+    You better watch out
+    You better not ${ask('verb')}
+    Better not ${ask('verb')}
+    I'm telling you why
+    ${_santa} is coming to ${_place}
+    
+    He's making a ${ask('noun')}
+    And ${ask('verb/ing')} it twice;
+    Gonna find out Who's ${ask('adjective')} and ${ask('adjective')}
+    ${_santa} is coming to ${_place}
+
+    He sees you when you're ${ask('verb/ing')}
+    He knows when you're ${ask('adjective')}
+    He knows if you've been ${ask('adjective')} or ${ask('adjective')}
+    So ${ask('phrase you would tell a child')}!
+  `}],
+
+  ["Christmas Song 2", 16, () => {
+    let [_part, _name, _animal, _1] = [ask('body part'), ask('person\'s name'), ask('animal'), ask('adjective')]
+    return `
+    <h1>${_name} the ${_1}-${_part} ${_animal}</h1>
+
+    ${_name} the ${_1}-${_part} ${_animal}
+    Had a very ${ask('adjective')} ${_part}
+    And if you ever ${ask('action to an object')} it
+    You would even say it ${ask('verb/s')}
+
+    All of the other ${_animal}s
+    Used to ${ask('verb')} and call him ${ask('mean nickname')}
+    They never let poor ${_name}
+    Join in any ${_animal} games
+
+    Then one ${ask('adjective')} ${ask('event name')} Eve
+    ${ask('person\'s name')} came to say
+    "${_name}, with your ${_part} so ${ask('adjective')}
+    Won't you ${ask('something you would ask a neighbor to do for you')} ${ask('time/date')}?"
+
+    Then how the ${_animal}s loved him
+    As they shouted out with ${ask('emotion')}
+    "${_name} the ${_1}-${_part} ${_animal}
+    You'll go down in history"
+  `}],
 ]
 
-const [total, template] = madLibs[1]
-totalCount = total
 
-document.getElementById('display').innerHTML = template()
+function play(index) {
+  const [, count, template] = madLibs[index]
+  currentCount = 1
+  totalCount = count
+  document.getElementById('display').innerHTML = '<div></div>' // reset the form
+  try {
+    document.getElementById('display').innerHTML = template() + `
+    
+  
+  
+      <a href="#" onclick="menu()">Menu</a>
+    `
+  } catch (err) {
+    menu()
+  }
+}
+
+function menu() {
+  document.getElementById('display').innerHTML = `
+    <h1>Christmas MadLibs</h1>
+    
+
+${madLibs.map(([title, count], index) => `<a href="#" onclick="play(${index})">${title} (${count} blanks)</a>`).join('\n\n')}
+  `
+}
+
+menu() // start us off
