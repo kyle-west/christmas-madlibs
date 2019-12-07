@@ -2,6 +2,7 @@
 
 I made this as a fun party game to play with friends. Enjoy. Message me on Twitter ([@Kyl3W3st](https://twitter.com/Kyl3W3st)) if you have any issues or liked it.
 
+## [Check it out here](https://kyle-west.github.io/christmas-madlibs/) 
 
 
 #### Credits
